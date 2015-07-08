@@ -78,9 +78,30 @@ int main()
             }
             //////////////////////////////////////////////////////////////
             
+
+			// skeletonization
+			
+				Mat skel( fore.size(), CV_8UC1, cv::Scalar(0) );
+				Mat tmp( fore.size(), CV_8UC1);
+				Mat element = getStructuringElement( cv::MORPH_CROSS, cv::Size(3, 3) );
+				bool done;
+				do
+				{
+					cv::morphologyEx(fore, tmp, cv::MORPH_OPEN, element);
+					cv::bitwise_not(tmp, tmp);
+					cv::bitwise_and(fore, tmp, tmp);
+					cv::bitwise_or(skel, tmp, skel);
+					cv::erode(fore, fore, element);
+ 
+					double max;
+					cv::minMaxLoc(fore, 0, &max);
+					done = (max == 0);
+				} while (!done);
+				
+			// end skeletonization
             
             imshow("original", frame);
-            imshow("fore", fore);
+            imshow("fore", skel);
             imshow("meanshift", frame);   
         }
         catch(Exception& e)
