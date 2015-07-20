@@ -2,15 +2,17 @@
 #define ___main
 
 // openCV
-#include <opencv/cv.h>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/core/core.hpp>
-#include <opencv2/video/background_segm.hpp>
-#include <opencv2/video/video.hpp>
+#include "opencv/cv.h"
+#include "opencv/cvblob.h"
+#include "opencv2\opencv.hpp"
 
 // basic header
+#include <algorithm>
 #include <iostream>
 #include <list>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <list> 
 
 #endif
