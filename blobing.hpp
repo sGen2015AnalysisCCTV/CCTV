@@ -4,7 +4,7 @@ using namespace std;
 using namespace cv;
 using namespace cvb; 
 
-void getblobs( Mat &frame, vector<Mat> &images)
+void getblobs( Mat *frame, vector<Mat> *images)
 {
 	//frame     : the image that want to extract blobs
 	//images    : the vector of image that store blob results.
@@ -14,9 +14,9 @@ void getblobs( Mat &frame, vector<Mat> &images)
 	IplImage *temp;
 	IplImage *lImg = cvCreateImage(cvSize(320, 240), IPL_DEPTH_LABEL, 1);
  
-	images.clear();
+	(*images).clear();
 	// convert cv::Mat to cv::IplImage
-	temp= &IplImage(frame);
+	temp= &IplImage(*frame);
 	
 	// Do Blobing  
 	unsigned int r = cvLabel(temp, lImg, blobs);
@@ -28,7 +28,7 @@ void getblobs( Mat &frame, vector<Mat> &images)
 //      printf("%d %d %d %d\n", blob->minx, blob->miny, blob->maxx, blob->maxy);
 //        
 //      it references the original image. but it can uses limit by area.
-		Mat roi = (frame)(Rect(blob->minx, blob->miny, blob->maxx - blob->minx, blob->maxy - blob->miny));
-		images.push_back(roi); 
+		Mat roi = (*frame)(Rect(blob->minx, blob->miny, blob->maxx - blob->minx, blob->maxy - blob->miny));
+		(*images).push_back(roi); 
 	}
 } 
