@@ -4,7 +4,12 @@
 // openCV
 #include "opencv/cv.h"
 #include "opencv/cvblob.h"
-#include "opencv2\opencv.hpp"
+
+#ifdef __GNUC__
+#include <opencv2/opencv.hpp>
+#else
+#include "opencv2/opencv.hpp"
+#endif
 
 // basic header
 #include <algorithm>
