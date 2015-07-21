@@ -20,4 +20,7 @@
 #include <string>
 #include <list> 
 
+#define VIDEO_WIDTH 640
+#define VIDEO_HEIGHT 480
+
 #endif
