@@ -6,7 +6,8 @@ using namespace cvb;
 
 CvBlobs getBlobs(Mat *frame);           // get frame blob results
 
-void getBlobMat(CvBlobs blobs, i        // get Mat(VIDEO_WIDTH * VIDEO_HEIGHT)
+void getBlobMat(Mat *frame,
+                CvBlobs blobs,         // get Mat(VIDEO_WIDTH * VIDEO_HEIGHT)
                 vector<Mat>* images);   // blob in blobs respectively.
 
 void getBlobDominantColor(Mat *frame,   // get average of blob color value 

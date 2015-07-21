@@ -29,7 +29,7 @@ long double getDistanceTwoPoint( const cv::Point& p1, const cv::Point& p2 ) {
 void eunchan() {
 	
 	cv::Mat origin, thresh, edge, dist, graph, fury, lpf, skel;
-	vector<vector<cv::Point>> contours;
+	vector< vector<cv::Point> > contours;
 	vector<cv::Vec4i> hierarchy;
 	cv::Point center;
 	cv::Point point_first;

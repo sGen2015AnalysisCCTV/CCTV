@@ -9,13 +9,6 @@ CvBlobs getBlobs(Mat *frame)
     IplImage *temp;
     IplImage *lImg = cvCreateImage(cvSize(VIDEO_WIDTH, VIDEO_HEIGHT), IPL_DEPTH_LABEL, 1);
     
-    //to free memory 
-    for(int i = 0; i < (*images).size(); i++)
-    {
-        (*images).at(i).release();
-    }
-
-    (*images).clear();
     // convert cv::Mat to cv::IplImage
     temp= &IplImage(*frame);
 
@@ -26,10 +19,16 @@ CvBlobs getBlobs(Mat *frame)
     return blobs;
 } 
 
-void getBlobMat(CvBlobs blobs, vector<Mat>* images)
+void getBlobMat(Mat* frame, CvBlobs blobs, vector<Mat>* images)
 {// function that returns specific Mat area of CvBlob object respectively with vector object
     
     CvBlob *blob;
+
+//    assert((*frame).channels() != 1 && "frame is not grayscale");
+
+    //to free memory 
+    for(int i = 0; i < (*images).size(); i++) (*images).at(i).release();
+    (*images).clear();
 
     for(CvBlobs::const_iterator it=blobs.begin(); it!=blobs.end(); ++it)
     {
@@ -65,7 +64,7 @@ void getBlobDominantColor(Mat *frame, CvBlobs blobs, vector<Scalar>* blobs_color
         {
             for(int x = blob->minx; x < blob->maxx; x++)
             {
-                tv = (*frame).at<Vec3b>(y, x)
+                tv = (*frame).at<Vec3b>(y, x);
                 tb = tv.val[0]; tg = tv.val[1]; tr = tv.val[2];
 
                 if(tr || tg || tb == 0) continue;
@@ -79,6 +78,6 @@ void getBlobDominantColor(Mat *frame, CvBlobs blobs, vector<Scalar>* blobs_color
         }
 
         r /= pCount; g /= pCount; b /= pCount;
-        (*blobs_color).push_Back(Scalar(r, g, b));
+        (*blobs_color).push_back(Scalar(r, g, b));
     }
 }
