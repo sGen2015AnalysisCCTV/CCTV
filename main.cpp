@@ -7,6 +7,9 @@ using namespace cv;
 int main() {
 	
 	cv::VideoCapture	cam;
+        cv::VideoWriter         writer("temp.avi", CV_FOURCC('M','J','P','G'),
+                                       15.0, Size(VIDEO_WIDTH, VIDEO_HEIGHT),
+                                       true);
 	cv::Mat			frame;
         CvBlobs                 blobs;
 	vector<cv::Mat>		blobs_image;
@@ -17,6 +20,7 @@ int main() {
 
 	int			i, j;
 
+        bool                    isRobbed = false;
 	// initialize variable
 	waitKey_exit = 'q';
 	waitKey_delay = 100;
@@ -31,7 +35,13 @@ int main() {
                 
                 // get frame from cam
                 cam >> frame;
+                
+                if(writer.isOpened() && isRobbed)
+                {
+                    //if 0 frame is written by writer, remove file.
+                    writer.write(frame);
 
+                }
                 // frame to be gray scale
                 cv::cvtColor( frame, frame, CV_BGR2GRAY );
 
@@ -45,7 +55,10 @@ int main() {
                                 cv::imshow( std::to_string((long double)i), blobs_image[i] );
                         }
                 } 
-
+               
+                //VideoWriter call distructor automatically.
+                //frame release
+                frame.release();
                 // delay
                 if (cv::waitKey(waitKey_delay) == waitKey_exit ) {
                         break; 
@@ -53,5 +66,5 @@ int main() {
         }
 
 	// end
-		return 0;
+	return 0;
 }
