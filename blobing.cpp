@@ -21,63 +21,51 @@ CvBlobs getBlobs(Mat *frame)
 
 void getBlobMat(Mat* frame, CvBlobs blobs, vector<Mat>* images)
 {// function that returns specific Mat area of CvBlob object respectively with vector object
-    
-    CvBlob *blob;
+    // assert((*frame).channels() != 1 && "frame is not grayscale");
 
-//    assert((*frame).channels() != 1 && "frame is not grayscale");
+    // to free memory 
+    std::for_each((*images).begin(), (*images).end(),[&](Mat m){m.release();}); (*images).clear();
 
-    //to free memory 
-    for(int i = 0; i < (*images).size(); i++) (*images).at(i).release();
-    (*images).clear();
-
-    for(CvBlobs::const_iterator it=blobs.begin(); it!=blobs.end(); ++it)
-    {
-        blob = (*it).second;
-//      printf("%d %d %d %d\n", blob->minx, blob->miny, blob->maxx, blob->maxy);
-//        
-//      it references the original image. but it can uses limit by area.
-
-        Mat roi = (*frame)(Rect(blob->minx, blob->miny, blob->maxx - blob->minx, blob->maxy - blob->miny));
-        Mat dst(Size(VIDEO_WIDTH, VIDEO_HEIGHT), CV_8UC1 ,0);
-
-        resize(roi, dst, Size(VIDEO_WIDTH, VIDEO_HEIGHT));
-        (*images).push_back(dst); 
-    }
+    std::for_each(blobs.begin(), blobs.end(), 
+            [&](pair<CvLabel, CvBlob*> blob){
+                CvBlob* tblob = blob.second;
+                Mat dst(Size(VIDEO_WIDTH, VIDEO_HEIGHT), CV_8UC1, 0);
+                resize((*frame)(Rect(tblob->minx, tblob->miny, tblob->maxx-tblob->minx, tblob->maxy-tblob->miny)), 
+                        dst, 
+                        Size(VIDEO_WIDTH, VIDEO_HEIGHT));
+                (*images).push_back(dst);
+            });
 }
 
 void getBlobDominantColor(Mat *frame, CvBlobs blobs, vector<Scalar>* blobs_color)
 {// function that returns dominant color in Blob Mat respectively. 
 // frame variable should be NOT GRAYSCALE.
 
-    CvBlob *blob;
-    int pCount = 0;
-
-    for(CvBlobs::const_iterator it=blobs.begin(); it != blobs.end(); ++it)
-    {
-        
-        blob = (*it).second;  
-        int tr = 0, tg = 0, tb = 0;
-        int r = 0,g = 0,b = 0;
-        Vec3b tv;
-
-        for(int y = blob->miny; y < blob->maxy; y++)
-        {
-            for(int x = blob->minx; x < blob->maxx; x++)
-            {
-                tv = (*frame).at<Vec3b>(y, x);
-                tb = tv.val[0]; tg = tv.val[1]; tr = tv.val[2];
-
-                if(tr || tg || tb == 0) continue;
-                else
+    std::for_each(blobs.begin(), blobs.end(), 
+            [&](pair<CvLabel, CvBlob*> blob){
+                CvBlob* tblob = blob.second;
+                int lx = tblob->minx, ly = tblob->miny;
+                int rx = tblob->maxx, ry = tblob->maxy;
+                int tr = 0, tg = 0, tb = 0;
+                int r = 0,g = 0,b = 0;
+                int pCount = 0;
+                for(int y = ly; y < ry; y++)
                 {
-                    pCount++;
-                    r += tr; g += tg; b += tb;
+                    for(int x = lx; x < rx; x++)
+                    {
+                        Vec3b tv = (*frame).at<Vec3b>(y, x);
+                        tb = tv.val[0]; tg = tv.val[1]; tr = tv.val[2];
+
+                        if(tr || tg || tb == 0) continue;
+                        else
+                        {
+                            pCount++;
+                            r += tr; g += tg; b += tb;
+                        }
+                    }
                 }
+                r /= pCount; g /= pCount; b /= pCount;
+                (*blobs_color).push_back(Scalar(r, g, b));
+            });
 
-            }
-        }
-
-        r /= pCount; g /= pCount; b /= pCount;
-        (*blobs_color).push_back(Scalar(r, g, b));
-    }
 }

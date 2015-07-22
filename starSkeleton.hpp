@@ -1,6 +1,5 @@
 #include "main.hpp"
 
-using namespace cv;
 using namespace std;
 using namespace cvb;
 
@@ -18,11 +17,9 @@ void printMat( cv::Mat &mat, const char *output_path ) {
 }
 
 // get distance between two point
-long double getDistanceTwoPoint( const cv::Point& p1, const cv::Point& p2 ) {
+inline long double getDistanceTwoPoint( const cv::Point& p1, const cv::Point& p2 ) {
 	cv::Point p3;
-
 	p3 = p1-p2;
-
 	return cv::sqrt( (long double)(p3.x)*(p3.x)+(p3.y)*(p3.y) );
 }
 
