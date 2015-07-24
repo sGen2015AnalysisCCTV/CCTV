@@ -15,7 +15,6 @@ CvBlobs getBlobs(Mat *frame)
     // Do Blobing  
     unsigned int r = cvLabel(temp, lImg, blobs);
     cvFilterByArea(blobs, 400, 10000000); 
-
     return blobs;
 } 
 

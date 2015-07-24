@@ -8,16 +8,16 @@ int main() {
 	
 	cv::VideoCapture	cam;
 	cv::VideoWriter		writer;
-	cv::Mat				frame;
-    CvBlobs				blobs;
+	cv::Mat			frame, thresh, fore;
+        CvBlobs			blobs;
 	vector<cv::Mat>		blobs_image;
 
 	char				waitKey_exit;
 	int					waitKey_delay;
 	char*				window_name_main; 
 	int					i, j; 
-    bool				isRobbed = false; 
-
+        bool				isRobbed = false; 
+        BackgroundSubtractorMOG2        bg;
 	// initialize
 	waitKey_exit = 'q';
 	waitKey_delay = 100;
@@ -42,10 +42,15 @@ int main() {
 
                 }
                 // frame to be gray scale
-                cv::cvtColor( frame, frame, CV_BGR2GRAY );
-
+                bg.operator()(frame, fore, 0);
+                cv::threshold(fore,fore, 250, 255, 0);
+                for(int i = 0; i < 5; i++)
+                {
+                    erode(fore, fore, Mat());
+                    dilate(fore, fore, Mat());
+                }
                 // blobing
-                blobs = getBlobs(&frame);
+                blobs = getBlobs(&fore);
                 getBlobMat(&frame, blobs, &blobs_image);
                 // blobing test
                 if( false ) {
