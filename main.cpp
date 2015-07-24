@@ -7,20 +7,19 @@ using namespace cv;
 int main() {
 	
 	cv::VideoCapture	cam;
-        cv::VideoWriter         writer("temp.avi", CV_FOURCC('M','J','P','G'),
-                                       15.0, Size(VIDEO_WIDTH, VIDEO_HEIGHT),
-                                       true);
-	cv::Mat			frame;
-        CvBlobs                 blobs;
+    cv::VideoWriter		writer("temp.avi", CV_FOURCC('M','J','P','G'),
+						15.0, Size(VIDEO_WIDTH, VIDEO_HEIGHT),
+						true);
+	cv::Mat				frame;
+    CvBlobs				blobs;
 	vector<cv::Mat>		blobs_image;
 
-	char			waitKey_exit;
-	int			waitKey_delay;
-	string			window_name_main;
+	char				waitKey_exit;
+	int					waitKey_delay;
+	char*				window_name_main; 
+	int					i, j; 
+    bool				isRobbed = false;
 
-	int			i, j;
-
-        bool                    isRobbed = false;
 	// initialize variable
 	waitKey_exit = 'q';
 	waitKey_delay = 100;
@@ -50,10 +49,7 @@ int main() {
                 getBlobMat(&frame, blobs, &blobs_image);
                 // blobing test
                 if( false ) {
-                        for( i=0; i<blobs.size(); i++ ) {
-                                cv::namedWindow( std::to_string((long double)i) );
-                                cv::imshow( std::to_string((long double)i), blobs_image[i] );
-                        }
+                        
                 } 
                
                 //VideoWriter call distructor automatically.
