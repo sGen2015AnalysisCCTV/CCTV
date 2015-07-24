@@ -2,7 +2,8 @@
 #include <queue>
 #include <mutex>
 #include <condition_variable>
-<template T>
+
+template < typename T >
 class CircularQueue
 {
     private:
