@@ -50,4 +50,4 @@ class CircularQueue
         {
             return q.size();
         }
-}
+};

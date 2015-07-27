@@ -1,20 +1,25 @@
 #include "blobing.hpp"
 
-CvBlobs getBlobs(Mat *frame)
+CvBlobs getBlobs(Mat *frame, Mat* oframe=nullptr)
 {// function that returns blob algorithm result with CvBlobs object.
     //frame     : the image that want to extract blobs
     //images    : the vector of image that store blob results.
     // !! frames should be gray scale image. if not, assertion will failed.
     CvBlobs blobs;
-    IplImage *temp;
+    IplImage *temp, *otemp;
     IplImage *lImg = cvCreateImage(cvSize(VIDEO_WIDTH, VIDEO_HEIGHT), IPL_DEPTH_LABEL, 1);
     
     // convert cv::Mat to cv::IplImage
     temp= &IplImage(*frame);
-
+    otemp = &IplImage(*oframe);
     // Do Blobing  
     unsigned int r = cvLabel(temp, lImg, blobs);
-    cvFilterByArea(blobs, 400, 10000000); 
+    cvFilterByArea(blobs, 5000, 100000); 
+
+    if(oframe != nullptr)
+    {
+        cvRenderBlobs(lImg, blobs, otemp, otemp, CV_BLOB_RENDER_BOUNDING_BOX); 
+    }
     return blobs;
 } 
 
@@ -23,7 +28,7 @@ void getBlobMat(Mat* frame, CvBlobs blobs, vector<Mat>* images)
     // assert((*frame).channels() != 1 && "frame is not grayscale");
 
     // to free memory 
-    std::for_each((*images).begin(), (*images).end(),[&](Mat m){m.release();}); (*images).clear();
+    for_each((*images).begin(), (*images).end(),[&](Mat m){m.release();}); (*images).clear();
 
     std::for_each(blobs.begin(), blobs.end(), 
             [&](pair<CvLabel, CvBlob*> blob){
@@ -34,13 +39,14 @@ void getBlobMat(Mat* frame, CvBlobs blobs, vector<Mat>* images)
                         Size(VIDEO_WIDTH, VIDEO_HEIGHT));
                 (*images).push_back(dst);
             });
+
 }
 
 void getBlobDominantColor(Mat *frame, CvBlobs blobs, vector<Scalar>* blobs_color)
 {// function that returns dominant color in Blob Mat respectively. 
 // frame variable should be NOT GRAYSCALE.
 
-    std::for_each(blobs.begin(), blobs.end(), 
+    for_each(blobs.begin(), blobs.end(), 
             [&](pair<CvLabel, CvBlob*> blob){
                 CvBlob* tblob = blob.second;
                 int lx = tblob->minx, ly = tblob->miny;
@@ -68,3 +74,4 @@ void getBlobDominantColor(Mat *frame, CvBlobs blobs, vector<Scalar>* blobs_color
             });
 
 }
+

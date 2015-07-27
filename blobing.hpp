@@ -4,7 +4,7 @@ using namespace std;
 using namespace cv;
 using namespace cvb;
 
-CvBlobs getBlobs(Mat *frame);           // get frame blob results
+CvBlobs getBlobs(Mat *frame, Mat* oframe=nullptr);           // get frame blob results
 
 void getBlobMat(Mat *frame,
                 CvBlobs blobs,         // get Mat(VIDEO_WIDTH * VIDEO_HEIGHT)

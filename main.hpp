@@ -19,6 +19,8 @@
 #include <iostream>
 #include <string>
 #include <list> 
+#include <time.h>
+#include <thread>
 
 #define VIDEO_WIDTH 640
 #define VIDEO_HEIGHT 480

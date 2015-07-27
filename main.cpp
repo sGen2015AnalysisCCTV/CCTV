@@ -1,3 +1,6 @@
+// This Code is for stationary frame.
+// Never use it When the camera environment is moving
+
 #include "blobing.hpp"
 #include "starSkeleton.hpp"
 #include "main.hpp"
@@ -18,6 +21,12 @@ int main() {
 	int					i, j; 
         bool				isRobbed = false; 
         BackgroundSubtractorMOG2        bg;
+
+        clock_t frame_start, frame_end;
+        clock_t ed_start, ed_end; 
+
+        vector<thread> threads;
+        int cores = thread::hardware_concurrency();
 	// initialize
 	waitKey_exit = 'q';
 	waitKey_delay = 100;
@@ -25,47 +34,64 @@ int main() {
 	
 	cam.open( 0 );
 	cv::namedWindow( window_name_main );
+        cv::namedWindow("blobing");
 	writer = cv::VideoWriter("temp.avi", CV_FOURCC('M', 'J', 'P', 'G'),
 							15.0, Size(VIDEO_WIDTH, VIDEO_HEIGHT),
 							true);
 
 	// main loop
         while( true ) {
-                
+                frame_start = clock(); 
                 // get frame from cam
                 cam >> frame;
                 
                 if(writer.isOpened() && isRobbed)
                 {
                     //if 0 frame is written by writer, remove file.
-                    writer.write(frame);
+                    //writer.write(frame);
 
                 }
                 // frame to be gray scale
                 bg.operator()(frame, fore, 0);
                 cv::threshold(fore,fore, 250, 255, 0);
-                for(int i = 0; i < 5; i++)
+                
+                
+                for(int j = 0; j < cores; j++) 
                 {
-                    erode(fore, fore, Mat());
-                    dilate(fore, fore, Mat());
+                    auto code = [&]()
+                            {
+                                for(int i = 0; i < 3; i++)
+                                {
+                                    erode(fore, fore, Mat());
+                                    dilate(fore, fore, Mat());
+                                }
+                           };
+                    threads.push_back(thread(code));
                 }
-                // blobing
-                blobs = getBlobs(&fore);
+                for(thread& t: threads)
+                {
+                    if(t.joinable()) t.join();
+                }
+
+                
+                blobs = getBlobs(&fore, &frame);
                 getBlobMat(&frame, blobs, &blobs_image);
                 // blobing test
                 if( false ) {
                         
-                } 
-               
+                }
+                imshow(window_name_main, frame);
+                imshow("blobing", fore);
                 //VideoWriter call distructor automatically.
                 //frame release
-                frame.release();
                 // delay
                 if (cv::waitKey(waitKey_delay) == waitKey_exit ) {
                         break; 
                 }
+
+                frame_end = clock();
+                printf("%f ms\n", (double)(frame_end-frame_start)/ CLOCKS_PER_SEC);
         }
 
-	// end
 	return 0;
 }
