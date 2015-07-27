@@ -1,6 +1,4 @@
-﻿#ifndef ___main
-#define ___main
-
+﻿#pragma once
 // openCV
 #include "opencv/cv.h"
 #include "opencv/cvblob.h"
@@ -12,6 +10,7 @@
 #endif
 
 // basic header
+#include <assert.h>
 #include <algorithm>
 #include <iostream>
 #include <list>
@@ -24,5 +23,3 @@
 
 #define VIDEO_WIDTH 640
 #define VIDEO_HEIGHT 480
-
-#endif

@@ -23,6 +23,17 @@ inline long double getDistanceTwoPoint( const cv::Point& p1, const cv::Point& p2
 	return cv::sqrt( (long double)(p3.x)*(p3.x)+(p3.y)*(p3.y) );
 }
 
+void filterByInertia()
+{
+
+}
+
+
+void filterByCircularity()
+{
+
+}
+
 void eunchan() {
 	
 	cv::Mat origin, thresh, edge, dist, graph, fury, lpf, skel;

@@ -1,6 +1,6 @@
 .SUFFIXES : .cpp .o
 
-OBJECTS = main.o blobing.o CircularQueue.o
+OBJECTS = main.o blobing.o CircularQueue.o ShapeDiscriptor.o
 TARGET = cctv
 INC = -I/usr/local/include/opencv2 -I/usr/local/include/opencv
 DIRECTORY = -L/usr/local/lib/
@@ -19,6 +19,6 @@ main.o : starSkeleton.hpp main.hpp main.cpp
 blobing.o : blobing.hpp blobing.cpp
 CircularQueue.o : CircularQueue.hpp CircularQueue.cpp
 starSkeleton.o : starSkeleton.hpp main.hpp
-
+ShapeDiscriptor.o : ShapeDiscriptor.hpp ShapeDiscriptor.cpp
 clean :
-	rm -rf $(OBJECTS) $(TARGET)
+	rm -rf $(OBJECTS) $(TARGET) temp.avi

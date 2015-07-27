@@ -39,6 +39,11 @@ int main() {
 							15.0, Size(VIDEO_WIDTH, VIDEO_HEIGHT),
 							true);
 
+
+        for(int i = 0; i < 10; i++)
+        {
+            cv::namedWindow(to_string(i));
+        }
 	// main loop
         while( true ) {
                 frame_start = clock(); 
@@ -77,8 +82,13 @@ int main() {
                 blobs = getBlobs(&fore, &frame);
                 getBlobMat(&frame, blobs, &blobs_image);
                 // blobing test
-                if( false ) {
-                        
+                if( true ) {
+                        cout <<blobs_image.size() << endl;
+                        for(int i = 0; i < blobs_image.size(); i++)
+                        {
+                            cv::imshow(to_string(i), blobs_image[i]);
+
+                        }
                 }
                 imshow(window_name_main, frame);
                 imshow("blobing", fore);
