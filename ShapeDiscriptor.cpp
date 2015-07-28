@@ -1,22 +1,20 @@
 #include "ShapeDiscriptor.hpp"
 
-bool ShapeDiscriptor::discribeImage(const cv::Mat &image)
+bool ShapeDiscriptor::discribeImage(cv::Mat &image)
 {
-    cv::Mat tmpImage;
     std::vector< std::vector<cv::Point> > contours;
-    std::vector<cv::Vec4i> hierarchy;
     //ShapeProperty p;
-    
-    findContours(contours, image, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0,0));
+    cv::Mat timage = image.clone(); 
+    findContours(timage, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
 
     for(int contourIdx = 0; contourIdx < contours.size(); contourIdx++)
     {
         cv::Moments moms = moments(cv::Mat(contours[contourIdx]));
         if(doFilterArea)
         {
-          double area = moms.m00;
-          //p.area = area;
-          if (area < minArea || area > maxArea)
+            double area = moms.m00;
+            if (area < minArea || area > maxArea)
+            drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
             continue;
         }
         
@@ -25,8 +23,9 @@ bool ShapeDiscriptor::discribeImage(const cv::Mat &image)
           double area = moms.m00;
           double perimeter = cv::arcLength(cv::Mat(contours[contourIdx]), true);
           double ratio = 4 * CV_PI * area / (perimeter * perimeter);
-          //p.circularity = ratio;
           if (ratio < minCircularity)
+            drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
+
             continue;
         }
 
@@ -52,6 +51,8 @@ bool ShapeDiscriptor::discribeImage(const cv::Mat &image)
           }
           //p.inErtia = ratio;
           if (ratio < minInertia)
+             drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
+             
             continue;
         }
 
@@ -64,6 +65,8 @@ bool ShapeDiscriptor::discribeImage(const cv::Mat &image)
           double ratio = area / hullArea;
           //p.convexity = ratio;
           if (ratio < minConvexity)
+            drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
+
             continue;
         }
 
@@ -72,19 +75,24 @@ bool ShapeDiscriptor::discribeImage(const cv::Mat &image)
     return false;
 } 
 
-const std::vector<cv::Mat>& ShapeDiscriptor::discribeImages(const std::vector<cv::Mat> &images)
+void ShapeDiscriptor::discribeImages(std::vector<cv::Mat> &images)
 {
-    std::for_each(images.begin(), images.end(),
-           [&](cv::Mat image){
-                if(discribeImage(image))
-                    filterResults.push_back(image);
-           });
-    return filterResults;
+    for(std::vector<cv::Mat>::iterator iter = images.begin(); iter != images.end();)
+    {
+        if(!discribeImage(*iter)){
+            images.erase(iter);
+        }else
+        {
+            iter++;
+
+        }
+
+    }
 }
 
-void ShapeDiscriptor::setInertia(float minInertia, float maxInertia)
+void ShapeDiscriptor::setInertiaFilter(float minInertia, float maxInertia)
 {
-    assert(minInertia < 0 || maxInertia > 1);
+    assert(minInertia >= 0.0f && maxInertia <= 1.0f);
     doFilterInertia = true;
     this->minInertia = minInertia;
     this->maxInertia = maxInertia;
@@ -92,7 +100,7 @@ void ShapeDiscriptor::setInertia(float minInertia, float maxInertia)
 
 void ShapeDiscriptor::setCircularityFilter(float minCicularity, float maxCircularity)
 {
-    assert(minCircularity < 0 || maxCircularity > 1);
+    assert(minCircularity >= 0.0f || maxCircularity <= 1.0f);
     doFilterCircularity = true;
     this->minCircularity = minCircularity;
     this->maxCircularity = maxCircularity;
@@ -100,7 +108,7 @@ void ShapeDiscriptor::setCircularityFilter(float minCicularity, float maxCircula
 
 void ShapeDiscriptor::setConvexityFilter(float minConvexity, float maxConvexity)
 {
-    assert(minConvexity < 0 || maxConvexity > 1);
+    assert(minConvexity >= 0.0f || maxConvexity < 1.0f);
     doFilterConvexity = true;
     this->minConvexity = minConvexity;
     this->maxConvexity = maxConvexity;

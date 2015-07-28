@@ -16,10 +16,12 @@ CvBlobs getBlobs(Mat *frame, Mat* oframe=nullptr)
     unsigned int r = cvLabel(temp, lImg, blobs);
     cvFilterByArea(blobs, 5000, 100000); 
 
+    /*
     if(oframe != nullptr)
     {
         cvRenderBlobs(lImg, blobs, otemp, otemp, CV_BLOB_RENDER_BOUNDING_BOX); 
     }
+    */
     return blobs;
 } 
 

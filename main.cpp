@@ -3,6 +3,7 @@
 
 #include "blobing.hpp"
 #include "starSkeleton.hpp"
+#include "ShapeDiscriptor.hpp"
 #include "main.hpp"
 using namespace std;
 using namespace cv;
@@ -13,7 +14,7 @@ int main() {
 	cv::VideoWriter		writer;
 	cv::Mat			frame, thresh, fore;
         CvBlobs			blobs;
-	vector<cv::Mat>		blobs_image;
+        std::vector<cv::Mat>		blobs_image, human_image;
 
 	char				waitKey_exit;
 	int					waitKey_delay;
@@ -40,11 +41,12 @@ int main() {
 							true);
 
 
-        for(int i = 0; i < 10; i++)
-        {
-            cv::namedWindow(to_string(i));
-        }
-	// main loop
+        ShapeDiscriptor sd;
+        sd.setInertiaFilter(0.7f, 1.0f);
+        sd.setCircularityFilter(0.4f, 1.0f);
+        sd.setConvexityFilter(0.4f, 1.0f);
+        for(int i = 0; i < 10; i++) cv::namedWindow(to_string(i));
+
         while( true ) {
                 frame_start = clock(); 
                 // get frame from cam
@@ -59,14 +61,14 @@ int main() {
                 // frame to be gray scale
                 bg.operator()(frame, fore, 0);
                 cv::threshold(fore,fore, 250, 255, 0);
-                
-                
+                                
                 for(int j = 0; j < cores; j++) 
                 {
                     auto code = [&]()
                             {
                                 for(int i = 0; i < 3; i++)
                                 {
+                                    erode(fore, fore, Mat());
                                     erode(fore, fore, Mat());
                                     dilate(fore, fore, Mat());
                                 }
@@ -80,8 +82,10 @@ int main() {
 
                 
                 blobs = getBlobs(&fore, &frame);
-                getBlobMat(&frame, blobs, &blobs_image);
+                getBlobMat(&fore, blobs, &blobs_image);
+                sd.discribeImages(blobs_image);
                 // blobing test
+                
                 if( true ) {
                         cout <<blobs_image.size() << endl;
                         for(int i = 0; i < blobs_image.size(); i++)
@@ -90,6 +94,7 @@ int main() {
 
                         }
                 }
+                
                 imshow(window_name_main, frame);
                 imshow("blobing", fore);
                 //VideoWriter call distructor automatically.
