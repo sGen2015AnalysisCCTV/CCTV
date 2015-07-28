@@ -6,15 +6,15 @@ bool ShapeDiscriptor::discribeImage(cv::Mat &image)
     //ShapeProperty p;
     cv::Mat timage = image.clone(); 
     findContours(timage, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
-
     for(int contourIdx = 0; contourIdx < contours.size(); contourIdx++)
     {
+
         cv::Moments moms = moments(cv::Mat(contours[contourIdx]));
         if(doFilterArea)
         {
             double area = moms.m00;
             if (area < minArea || area > maxArea)
-            drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
+            //drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
             continue;
         }
         
@@ -24,8 +24,7 @@ bool ShapeDiscriptor::discribeImage(cv::Mat &image)
           double perimeter = cv::arcLength(cv::Mat(contours[contourIdx]), true);
           double ratio = 4 * CV_PI * area / (perimeter * perimeter);
           if (ratio < minCircularity)
-            drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
-
+            //drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
             continue;
         }
 
@@ -51,7 +50,7 @@ bool ShapeDiscriptor::discribeImage(cv::Mat &image)
           }
           //p.inErtia = ratio;
           if (ratio < minInertia)
-             drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
+             //drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
              
             continue;
         }
@@ -65,7 +64,7 @@ bool ShapeDiscriptor::discribeImage(cv::Mat &image)
           double ratio = area / hullArea;
           //p.convexity = ratio;
           if (ratio < minConvexity)
-            drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
+            //drawContours(image, contours, contourIdx, cv::Scalar(0,0,0), CV_FILLED);
 
             continue;
         }
@@ -81,6 +80,8 @@ void ShapeDiscriptor::discribeImages(std::vector<cv::Mat> &images)
     {
         if(!discribeImage(*iter)){
             images.erase(iter);
+            printf("erased!\n");
+
         }else
         {
             iter++;

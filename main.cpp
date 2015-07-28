@@ -69,7 +69,6 @@ int main() {
                                 for(int i = 0; i < 3; i++)
                                 {
                                     erode(fore, fore, Mat());
-                                    erode(fore, fore, Mat());
                                     dilate(fore, fore, Mat());
                                 }
                            };
