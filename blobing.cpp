@@ -16,7 +16,7 @@ CvBlobs getBlobs(Mat *frame, Mat* oframe)
     unsigned int r = cvLabel(temp, lImg, blobs);
     cvFilterByArea(blobs, 5000, 100000); 
     
-    cvReleaseImage(&lImg)
+    cvReleaseImage(&lImg);
     /*
     if(oframe != nullptr)
     {

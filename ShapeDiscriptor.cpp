@@ -4,6 +4,7 @@ bool ShapeDiscriptor::discribeImage(cv::Mat &image)
 {
     std::vector< std::vector<cv::Point> > contours;
     cv::Mat timage = image.clone();
+    printf("rows : %d\n", image.rows);
     findContours(timage, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
     for(int contourIdx = 0; contourIdx < contours.size(); contourIdx++)
     {

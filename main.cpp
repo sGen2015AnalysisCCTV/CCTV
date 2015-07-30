@@ -83,6 +83,11 @@ int main() {
                 blobs = getBlobs(&fore, &frame);
                 getBlobMat(&fore, blobs, &blobs_image);
                 sd.discribeImages(blobs_image);
+                for(int i = 0; i < blobs_image.size(); i++)
+                {
+                    starSkeleton(blobs_image[i], blobs_image[i]);
+
+                }
                 // blobing test
                 
                 if( true ) {
