@@ -1,6 +1,6 @@
 #include "blobing.hpp"
 
-CvBlobs getBlobs(Mat *frame, Mat* oframe=nullptr)
+CvBlobs getBlobs(Mat *frame, Mat* oframe)
 {// function that returns blob algorithm result with CvBlobs object.
     //frame     : the image that want to extract blobs
     //images    : the vector of image that store blob results.
