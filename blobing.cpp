@@ -14,7 +14,17 @@ CvBlobs getBlobs(Mat *frame, Mat* oframe)
     otemp = &IplImage(*oframe);
     // Do Blobing  
     unsigned int r = cvLabel(temp, lImg, blobs);
-    cvFilterByArea(blobs, 5000, 100000); 
+    /*
+    for_each(blobs.begin(), blobs.end(),
+            [&](pair<CvLabel, CvBlob*> blob){
+                CvBlob* tblob = blob.second;
+                
+
+            });*/
+
+
+    cvFilterByArea(blobs, 5000, 100000);
+
     
     cvReleaseImage(&lImg);
     /*

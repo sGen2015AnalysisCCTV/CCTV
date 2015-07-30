@@ -45,7 +45,9 @@ int main() {
         sd.setInertiaFilter(0.7f, 1.0f);
         sd.setCircularityFilter(0.4f, 1.0f);
         sd.setConvexityFilter(0.4f, 1.0f);
-        for(int i = 0; i < 10; i++) cv::namedWindow(to_string(i));
+
+        vector< vector<Point> > contours;
+        cv::Mat contours_image;
 
         while( true ) {
                 frame_start = clock(); 
@@ -61,7 +63,8 @@ int main() {
                 // frame to be gray scale
                 bg.operator()(frame, fore, 0);
                 cv::threshold(fore,fore, 250, 255, 0);
-                                
+
+                
                 for(int j = 0; j < cores; j++) 
                 {
                     auto code = [&]()
@@ -78,11 +81,21 @@ int main() {
                 {
                     if(t.joinable()) t.join();
                 }
+                contours_image = fore.clone();
+                findContours(contours_image, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+                for(int i = 0; i < contours.size(); i++)
+                {
+                    double area0 = contourArea(contours[i]);
+                    if(area0 < 4000)
+                    {
+                        drawContours(fore, contours, i, Scalar(0,0,0), CV_FILLED);
 
-                
+                    }
+                }
+
                 blobs = getBlobs(&fore, &frame);
                 getBlobMat(&fore, blobs, &blobs_image);
-                sd.discribeImages(blobs_image);
+                //sd.discribeImages(blobs_image);
                 for(int i = 0; i < blobs_image.size(); i++)
                 {
                     starSkeleton(blobs_image[i], blobs_image[i]);
