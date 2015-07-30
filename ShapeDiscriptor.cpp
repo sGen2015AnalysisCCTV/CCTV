@@ -3,8 +3,7 @@
 bool ShapeDiscriptor::discribeImage(cv::Mat &image)
 {
     std::vector< std::vector<cv::Point> > contours;
-    //ShapeProperty p;
-    cv::Mat timage = image.clone(); 
+    cv::Mat timage = image.clone();
     findContours(timage, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
     for(int contourIdx = 0; contourIdx < contours.size(); contourIdx++)
     {
@@ -69,8 +68,10 @@ bool ShapeDiscriptor::discribeImage(cv::Mat &image)
             continue;
         }
 
+        timage.release();
         return true;
     }
+    timage.release();
     return false;
 } 
 
@@ -80,7 +81,6 @@ void ShapeDiscriptor::discribeImages(std::vector<cv::Mat> &images)
     {
         if(!discribeImage(*iter)){
             images.erase(iter);
-            printf("erased!\n");
 
         }else
         {
