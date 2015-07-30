@@ -254,13 +254,7 @@ I_FOUND_FIRST_CONTOUR:
 	if( vector_derivative.size() < point_cnt )
 		return 0;
 
-	// derivative huristic algorithm
-	// quick sort
-	// quickSort_derivative( vector_derivative, vector_derivative_point, 0, vector_derivative.size()-1 ); 
-	// show all point
-	for( i=0; i<vector_derivative_point.size(); i++ ) {
-		cv::circle( skel, vector_derivative_point[i], 3, color_left_hand, 2 );
-	}
+	// derivative huristic algorithm 
 	// find where is the head
 	head_idx = 0;
 	for( i=1; i<vector_derivative.size(); i++ ) {
