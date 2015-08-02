@@ -49,7 +49,7 @@ void getBlobMat(Mat* frame, CvBlobs blobs, vector<Mat>* images)
                 Mat dst(Size(VIDEO_WIDTH, VIDEO_HEIGHT), CV_8UC1, 0);
                 resize((*frame)(Rect(tblob->minx, tblob->miny, tblob->maxx-tblob->minx, tblob->maxy-tblob->miny)), 
                         dst, 
-                        Size(VIDEO_WIDTH, VIDEO_HEIGHT));
+                        Size(tblob->maxx - tblob->minx, tblob->maxy - tblob->miny));
                 (*images).push_back(dst);
             });
 

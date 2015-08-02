@@ -20,5 +20,6 @@ blobing.o : blobing.hpp blobing.cpp
 CircularQueue.o : CircularQueue.hpp CircularQueue.cpp
 starSkeleton.o : starSkeleton.hpp main.hpp
 ShapeDiscriptor.o : ShapeDiscriptor.hpp ShapeDiscriptor.cpp
+RegressionAnalysis.o : RegressionAnalysis.hpp main.hpp
 clean :
 	rm -rf $(OBJECTS) $(TARGET) temp.avi

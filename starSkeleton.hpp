@@ -255,7 +255,7 @@ I_FOUND_FIRST_CONTOUR:
 		return 0;
 
 	// derivative huristic algorithm 
-	// find where is the head
+	// find where is the head 
 	head_idx = 0;
 	for( i=1; i<vector_derivative.size(); i++ ) {
 		int x2 = abs( vector_derivative_point[i].x - point_center.x );
@@ -266,17 +266,19 @@ I_FOUND_FIRST_CONTOUR:
 	// find left hand
 	left_hand_idx = 0;
 	for( i=1; i<vector_derivative.size(); i++ ) {
-		int x1 = abs( vector_derivative_point[i].x - point_center.x );
-		int x2 = abs( vector_derivative_point[left_hand_idx].x - point_center.x );
-		if( x1 < x2 ) 
+		int x1 = getDistanceTwoPoint( point_center, vector_derivative_point[left_hand_idx] );
+		int x2 = getDistanceTwoPoint( point_center, vector_derivative_point[i] );
+                if( vector_derivative_point[head_idx].x > vector_derivative_point[i].x )
+                    if( x1 < x2 )
 			left_hand_idx = i;
 	}
 	// find right hand
 	right_hand_idx = 0;
 	for( i=1; i<vector_derivative.size(); i++ ) {
-		int x1 = abs( vector_derivative_point[i].x - point_center.x );
-		int x2 = abs( vector_derivative_point[right_hand_idx].x - point_center.x );
-		if( x1 > x2 ) 
+		int x1 = getDistanceTwoPoint( point_center, vector_derivative_point[right_hand_idx] );
+		int x2 = getDistanceTwoPoint( point_center, vector_derivative_point[i] );
+		if( vector_derivative_point[head_idx].x < vector_derivative_point[i].x )
+                    if( x1 < x2 )
 			right_hand_idx = i;
 	}
 

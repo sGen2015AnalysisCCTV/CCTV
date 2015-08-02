@@ -4,6 +4,7 @@
 #include "blobing.hpp"
 #include "starSkeleton.hpp"
 #include "ShapeDiscriptor.hpp"
+#include "RegressionAnalysis.hpp"
 #include "main.hpp"
 using namespace std;
 using namespace cv;
@@ -15,11 +16,12 @@ int main() {
 	cv::Mat			frame, thresh, fore;
         CvBlobs			blobs;
         std::vector<cv::Mat>		blobs_image, human_image;
-
+        bool                            clicked;
 	char				waitKey_exit;
 	int					waitKey_delay;
 	char*				window_name_main; 
 	int					i, j; 
+        int                             coefficients[2];
         bool				isRobbed = false; 
         BackgroundSubtractorMOG2        bg;
 
@@ -33,22 +35,28 @@ int main() {
 	waitKey_delay = 100;
 	window_name_main = "규진이에게 샤오미 보조배터리를!!"; 
 	
-	cam.open( 0 );
+	cam.open( 1 );
 	cv::namedWindow( window_name_main );
         cv::namedWindow("blobing");
 	writer = cv::VideoWriter("temp.avi", CV_FOURCC('M', 'J', 'P', 'G'),
 							15.0, Size(VIDEO_WIDTH, VIDEO_HEIGHT),
 							true);
 
-
+/*
         ShapeDiscriptor sd;
         sd.setInertiaFilter(0.7f, 1.0f);
         sd.setCircularityFilter(0.4f, 1.0f);
         sd.setConvexityFilter(0.4f, 1.0f);
-
+*/
         vector< vector<Point> > contours;
+        vector<Vec4i> hierarchy;
         cv::Mat contours_image;
-
+        while( true ) {
+            cam >> frame;
+            if( waitKey( waitKey_delay ) == 32 ) 
+                break;
+            imshow( window_name_main, frame );
+        }
         while( true ) {
                 frame_start = clock(); 
                 // get frame from cam
@@ -62,9 +70,14 @@ int main() {
                 }
                 // frame to be gray scale
                 bg.operator()(frame, fore, 0);
-                cv::threshold(fore,fore, 250, 255, 0);
-
                 
+                cv::threshold(fore,fore, 250, 255, 0);
+                erode(fore, fore, Mat());
+                dilate(fore, fore, Mat());
+                erode(fore, fore, Mat());
+                dilate(fore, fore, Mat());
+                dilate(fore, fore, Mat());
+/*                
                 for(int j = 0; j < cores; j++) 
                 {
                     auto code = [&]()
@@ -81,32 +94,42 @@ int main() {
                 {
                     if(t.joinable()) t.join();
                 }
+*/
                 contours_image = fore.clone();
-                findContours(contours_image, contours, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE);
+                findContours(contours_image, contours,hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
                 for(int i = 0; i < contours.size(); i++)
                 {
                     double area0 = contourArea(contours[i]);
-                    if(area0 < 4000)
+                    if(area0 < 2500)
                     {
-                        drawContours(fore, contours, i, Scalar(0,0,0), CV_FILLED);
+                        drawContours(fore, contours, i, Scalar(0,0,0), CV_FILLED);  
+                    }
+                    else
+                    {
+                        drawContours(fore, contours, i, Scalar(255,255,255), CV_FILLED);
 
                     }
-                }
 
+                }
+                
+//                linearRegression(coefficients, contours);
+//                printf("equation: y = %dx + %d\n", coefficients[1], coefficients[0]);
+                
                 blobs = getBlobs(&fore, &frame);
                 getBlobMat(&fore, blobs, &blobs_image);
-                //sd.discribeImages(blobs_image);
                 for(int i = 0; i < blobs_image.size(); i++)
                 {
-                    starSkeleton(blobs_image[i], blobs_image[i]);
+                    if(i == 1) break;
+                    starSkeleton(blobs_image[i], blobs_image[i], 3, 40);
 
                 }
                 // blobing test
                 
                 if( true ) {
-                        cout <<blobs_image.size() << endl;
+                        cout << blobs_image.size() << endl;
                         for(int i = 0; i < blobs_image.size(); i++)
                         {
+                            if(i == 1) break;
                             cv::imshow(to_string(i), blobs_image[i]);
 
                         }
