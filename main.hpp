@@ -21,5 +21,10 @@
 #include <time.h>
 #include <thread>
 
+// curl
+#include <curl/curl.h>
+
 #define VIDEO_WIDTH 640
 #define VIDEO_HEIGHT 480
+
+

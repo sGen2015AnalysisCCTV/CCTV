@@ -1,5 +1,5 @@
 #include "blobing.hpp"
-void getFrameDominantColor(Mat *frame, CvBlob* tblob, FILE* output = 0)
+void getFrameDominantColor(Mat *frame, CvBlob* tblob, int &hist_r, int &hist_g, int &hist_b)
 {// function that returns dominant color in Blob Mat respectitively. 
 // frame variable should be NOT GRAYSCALE.        
         int lx = tblob->minx, ly = tblob->miny;
@@ -19,7 +19,7 @@ void getFrameDominantColor(Mat *frame, CvBlob* tblob, FILE* output = 0)
         }
         if(pCount == 0) return;
         r /= pCount; g /= pCount; b /= pCount;
-        fprintf(output, " %d %d %d ", r, g, b); 
+		hist_r = r; hist_g = g; hist_b = b;
         
 }
 
@@ -59,7 +59,7 @@ CvBlobs getBlobs(Mat *frame, Mat* oframe)
     return blobs;
 } 
 
-void getBlobMat(Mat* frame, Mat*fore, CvBlobs blobs, vector<Mat>* images, FILE* output = 0)
+void getBlobMat(Mat* frame, Mat*fore, CvBlobs blobs, vector<Mat>* images, int &hist_r, int &hist_g, int &hist_b)
 {// function that returns specific Mat area of CvBlob object respectively with vector object
     // assert((*frame).channels() != 1 && "frame is not grayscale");
 
@@ -79,13 +79,14 @@ void getBlobMat(Mat* frame, Mat*fore, CvBlobs blobs, vector<Mat>* images, FILE* 
                 if(tblob->area >= max)
                 {
                     max = tblob->area;
-                    maxblob = blob.second;
-
+                    maxblob = blob.second; 
                 }
 
             });
-            if(maxblob != NULL) 
-                getFrameDominantColor(frame, maxblob, output);
+
+    if(maxblob != NULL) 
+        getFrameDominantColor(frame, maxblob, hist_r, hist_g, hist_b);
+
 
 
 }
