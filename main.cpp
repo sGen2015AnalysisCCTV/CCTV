@@ -10,7 +10,7 @@ using namespace std;
 using namespace cv;
 
 int main() {
-	
+        FILE*                   output;	
 	cv::VideoCapture	cam;
 	cv::VideoWriter		writer;
 	cv::Mat			frame, thresh, fore;
@@ -18,18 +18,10 @@ int main() {
         std::vector<cv::Mat>		blobs_image, human_image;
         bool                            clicked;
 	char				waitKey_exit;
-	int					waitKey_delay;
+	int				waitKey_delay;
 	char*				window_name_main; 
-	int					i, j; 
-        int                             coefficients[2];
-        bool				isRobbed = false; 
+	int				i, j; 
         BackgroundSubtractorMOG2        bg;
-
-        clock_t frame_start, frame_end;
-        clock_t ed_start, ed_end; 
-
-        vector<thread> threads;
-        int cores = thread::hardware_concurrency();
 	// initialize
 	waitKey_exit = 'q';
 	waitKey_delay = 100;
@@ -41,13 +33,8 @@ int main() {
 	writer = cv::VideoWriter("temp.avi", CV_FOURCC('M', 'J', 'P', 'G'),
 							15.0, Size(VIDEO_WIDTH, VIDEO_HEIGHT),
 							true);
+        output = fopen("data.txt", "w");
 
-/*
-        ShapeDiscriptor sd;
-        sd.setInertiaFilter(0.7f, 1.0f);
-        sd.setCircularityFilter(0.4f, 1.0f);
-        sd.setConvexityFilter(0.4f, 1.0f);
-*/
         vector< vector<Point> > contours;
         vector<Vec4i> hierarchy;
         cv::Mat contours_image;
@@ -58,43 +45,18 @@ int main() {
             imshow( window_name_main, frame );
         }
         while( true ) {
-                frame_start = clock(); 
                 // get frame from cam
                 cam >> frame;
-                
-                if(writer.isOpened() && isRobbed)
-                {
-                    //if 0 frame is written by writer, remove file.
-                    //writer.write(frame);
-
-                }
+               
                 // frame to be gray scale
-                bg.operator()(frame, fore, 0);
-                
+                bg.operator()(frame, fore, 0);                
                 cv::threshold(fore,fore, 250, 255, 0);
                 erode(fore, fore, Mat());
                 dilate(fore, fore, Mat());
                 erode(fore, fore, Mat());
                 dilate(fore, fore, Mat());
                 dilate(fore, fore, Mat());
-/*                
-                for(int j = 0; j < cores; j++) 
-                {
-                    auto code = [&]()
-                            {
-                                for(int i = 0; i < 3; i++)
-                                {
-                                    erode(fore, fore, Mat());
-                                    dilate(fore, fore, Mat());
-                                }
-                           };
-                    threads.push_back(thread(code));
-                }
-                for(thread& t: threads)
-                {
-                    if(t.joinable()) t.join();
-                }
-*/
+
                 contours_image = fore.clone();
                 findContours(contours_image, contours,hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
                 for(int i = 0; i < contours.size(); i++)
@@ -111,20 +73,18 @@ int main() {
                     }
 
                 }
-                
-//                linearRegression(coefficients, contours);
-//                printf("equation: y = %dx + %d\n", coefficients[1], coefficients[0]);
-                
+                               
                 blobs = getBlobs(&fore, &frame);
-                getBlobMat(&fore, blobs, &blobs_image);
+                getBlobMat(&frame,&fore, blobs, &blobs_image, output);
+                cvtColor(fore, thresh, CV_GRAY2RGB);
+                writer.write(thresh);
+
                 for(int i = 0; i < blobs_image.size(); i++)
                 {
                     if(i == 1) break;
-                    starSkeleton(blobs_image[i], blobs_image[i], 3, 40);
+                    starSkeleton(blobs_image[i], blobs_image[i], 3, 50, output);
 
-                }
-                // blobing test
-                
+                } 
                 if( true ) {
                         cout << blobs_image.size() << endl;
                         for(int i = 0; i < blobs_image.size(); i++)
@@ -134,19 +94,15 @@ int main() {
 
                         }
                 }
-                
+                 
                 imshow(window_name_main, frame);
                 imshow("blobing", fore);
-                //VideoWriter call distructor automatically.
-                //frame release
-                // delay
                 if (cv::waitKey(waitKey_delay) == waitKey_exit ) {
                         break; 
                 }
 
-                frame_end = clock();
-                printf("%f ms\n", (double)(frame_end-frame_start)/ CLOCKS_PER_SEC);
-        }
-
+                fflush(output);
+                }
+        fclose(output);
 	return 0;
 }

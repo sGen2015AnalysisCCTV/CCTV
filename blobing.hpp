@@ -7,11 +7,13 @@ using namespace cvb;
 
 CvBlobs getBlobs(Mat *frame, Mat* oframe=nullptr);           // get frame blob results
 
-void getBlobMat(Mat *frame,
+void getBlobMat(Mat *frame, 
+                Mat* fore,
                 CvBlobs blobs,         // get Mat(VIDEO_WIDTH * VIDEO_HEIGHT)
-                vector<Mat>* images);   // blob in blobs respectively.
+                vector<Mat>* images,
+                FILE* output = 0);   // blob in blobs respectively.
 
-void getBlobDominantColor(Mat *frame,   // get average of blob color value 
+void getFrameDominantColor(Mat *frame,   // get average of blob color value 
                           CvBlobs blobs, 
-                          vector<Scalar>* blobs_color);
+                          vector<Scalar>* blobs_color, FILE* output = 0);
 

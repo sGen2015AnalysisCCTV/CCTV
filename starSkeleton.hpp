@@ -90,7 +90,7 @@ point_cnt : pointing count
 return : 1 - success
 0 - has occured unkown error (but never give an info about what error occured)
 */
-int starSkeleton( cv::Mat &input_mat, cv::Mat &output_mat, unsigned int point_cnt = 3, unsigned int huristic_distance = 20 ) {
+int starSkeleton(cv::Mat &input_mat, cv::Mat &output_mat, unsigned int point_cnt = 3, unsigned int huristic_distance = 20, FILE* output = 0) {
 
 	cv::Mat origin, graph, skel;
 	cv::Point point_center;
@@ -293,6 +293,14 @@ I_FOUND_FIRST_CONTOUR:
 	cv::circle( skel, vector_derivative_point[right_hand_idx], 3, color_right_hand, 2 );
 	output_mat = skel;
 
+        
+        fprintf(output," %d %d %d %d %d %d \n", vector_derivative_point[head_idx].x, 
+                                    vector_derivative_point[head_idx].y,
+                                    vector_derivative_point[left_hand_idx].x,
+                                    vector_derivative_point[left_hand_idx].y,
+                                    vector_derivative_point[right_hand_idx].x,
+                                    vector_derivative_point[right_hand_idx].y);
+                
 	return 1;
 }
 
