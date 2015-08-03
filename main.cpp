@@ -4,200 +4,11 @@
 #include "blobing.hpp"
 #include "starSkeleton.hpp"
 #include "ShapeDiscriptor.hpp" 
+#include "WebSocket.hpp"
 #include "main.hpp"
 
 using namespace std;
-using namespace cv;
-
-// post class
-// push each input functions.
-// makeJson will return a string like below form.
-/*
-{ "head":{1,2},
-"left":{1,2},
-"right":{1,2},
-"center":{1,2},
-"hist":{1,2,3}
-}
-*/
-// histogram is r g b oder.
-class postClass {
-public:
-	string p_head;
-	string p_left_hand;
-	string p_right_hand;
-	string p_center;
-	string hist;
-
-	void push_head(cv::Point p) {
-		p_head.clear();
-		p_head += to_string(p.x);
-		p_head += ",";
-		p_head += to_string(p.y);
-	};
-	void push_left_hand(cv::Point p) {
-		p_left_hand.clear();
-		p_left_hand += to_string(p.x);
-		p_left_hand += ",";
-		p_left_hand += to_string(p.y);
-	};
-	void push_right_hand(cv::Point p) {
-		p_right_hand.clear();
-		p_right_hand += to_string(p.x);
-		p_right_hand += ",";
-		p_right_hand += to_string(p.y);
-	};
-	void push_center(cv::Point p) {
-		p_center.clear();
-		p_center += to_string(p.x);
-		p_center += ",";
-		p_center += to_string(p.y);
-	};
-	void push_hist(int r, int g, int b) {
-		hist.clear();
-		hist += to_string(r);
-		hist += ",";
-		hist += to_string(g);
-		hist += ",";
-		hist += to_string(b);
-	};
-	string giveMeJson() {
-		string rtn;
-		rtn += "{\"head\":{" + p_head + "},";
-		rtn += "\"left\":{" + p_left_hand + "},";
-		rtn += "\"right\":{" + p_right_hand + "},";
-		rtn += "\"center\":{" + p_center + "},";
-		rtn += "\"hist\":{" + hist + "}";
-		rtn += "}";
-		return rtn;
-	}; 
-};
-
-int sendToServer(string post_data)
-{
-	CURL *curl;
-	CURLcode res;
-
-	struct curl_httppost *formpost = NULL;
-	struct curl_httppost *lastptr = NULL;
-	struct curl_slist *headerlist = NULL;
-	static const char buf[] = "Expect:";
-
-	curl_global_init(CURL_GLOBAL_ALL);
-	/* videoId */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "videoId",
-		CURLFORM_COPYCONTENTS, "1",
-		CURLFORM_END);
-	/* userId */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "userId",
-		CURLFORM_COPYCONTENTS, "1",
-		CURLFORM_END);
-	/* videoDangerPoint */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "videoDangerPoint",
-		CURLFORM_COPYCONTENTS, "70",
-		CURLFORM_END);
-	/* videoDate */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "videoDate",
-		CURLFORM_COPYCONTENTS, "2015.08.02/03:01",
-		CURLFORM_END);
-	/* Reason1 */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "Reason1",
-		CURLFORM_COPYCONTENTS, "1",
-		CURLFORM_END);
-	/* Reason2 */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "Reason2",
-		CURLFORM_COPYCONTENTS, "1",
-		CURLFORM_END);
-	/* Reason3 */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "Reason3",
-		CURLFORM_COPYCONTENTS, "0",
-		CURLFORM_END);
-	/* Reason4 */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "Reason4",
-		CURLFORM_COPYCONTENTS, "0",
-		CURLFORM_END);
-	/* Reason5 */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "Reason5",
-		CURLFORM_COPYCONTENTS, "0",
-		CURLFORM_END);
-	/* visitorFace */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "visitorFace",
-		CURLFORM_FILE, "C:\\Users\\Public\\Pictures\\Sample Pictures\\Chrysanthemum.jpg",
-		CURLFORM_END);
-	/* Fill in the file upload field */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "videofile",
-		CURLFORM_FILE, "C:\\Users\\lec\\Desktop\\my\\p\\project_5_sgen_2015_summer_\\CCTV\\CCTV\\temp_origin.avi",
-		CURLFORM_END);
-
-	/* Fill in the filename field */
-	/*
-	curl_formadd(&formpost,
-	&lastptr,
-	CURLFORM_COPYNAME, "filename",
-	CURLFORM_COPYCONTENTS, "C:\\Users\\youjin\\hyj\\video\\test1.avi",
-	CURLFORM_END);
-	*/
-
-	/* Fill in the submit field too, even if this is rarely needed */
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "submit",
-		CURLFORM_COPYCONTENTS, "send",
-		CURLFORM_END);
-
-	curl = curl_easy_init();
-	/* initialize custom header list (stating that Expect: 100-continue is not
-	wanted */
-	headerlist = curl_slist_append(headerlist, buf);
-	if (curl) {
-		/* what URL that receives this POST */
-		curl_easy_setopt(curl, CURLOPT_URL, "http://210.125.96.109/upload.php");
-
-		/*
-		if ((argc == 2) && (!strcmp(argv[1], "noexpectheader")))
-		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
-		curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
-		*/
-
-		/* Perform the request, res will get the return code */
-		res = curl_easy_perform(curl);
-		/* Check for errors */
-		if (res != CURLE_OK)
-			fprintf(stderr, "curl_easy_perform() failed: %s\n",
-				curl_easy_strerror(res));
-
-		/* always cleanup */
-		curl_easy_cleanup(curl);
-
-		/* then cleanup the formpost chain */
-		curl_formfree(formpost);
-		/* free slist */
-		curl_slist_free_all(headerlist);
-	}
-	return 0;
-};
+using namespace cv;  
 
 int main() {
     ofstream				output;	
@@ -205,7 +16,7 @@ int main() {
 	cv::VideoWriter			writer;
 	cv::Mat					frame, thresh, fore;
 	CvBlobs					blobs;
-	std::vector<cv::Mat>	blobs_image, human_image;
+	std::vector<cv::Mat>	blobs_image;
 	bool					clicked;
 	char					waitKey_exit;
 	int						waitKey_delay;
@@ -222,6 +33,7 @@ int main() {
 	vector< vector<Point> >	contours; 
 	cv::Mat					contours_image;
 	postClass				post_data;
+	bool					do_output;
 
 	// initialize
 	waitKey_exit = 'q';
@@ -234,7 +46,8 @@ int main() {
 	writer = cv::VideoWriter(video_name, CV_FOURCC('M', 'J', 'P', 'G'),
 							15.0, Size(VIDEO_WIDTH, VIDEO_HEIGHT),
 							true);
-	output.open(output_name, 'w');
+	do_output = false;
+	if( do_output ) output.open(output_name, 'w');
 	
 	// manual start 
     while( false ) {
@@ -276,10 +89,10 @@ int main() {
 		}
 
 		// blobing
-		hist_r = hist_g = hist_b = 0;
+		hist_r = hist_g = hist_b = 0; 
 
         blobs = getBlobs(&fore, &frame);
-        getBlobMat(&frame,&fore, blobs, &blobs_image, hist_r, hist_g, hist_b); 
+        getBlobMat(&frame,&fore, blobs, &blobs_image, hist_r, hist_g, hist_b);  
 
 		if (blobs_image.size() > 0) {
 			// skeleton
@@ -298,9 +111,9 @@ int main() {
 				post_data.push_center(p_center);
 				post_data.push_hist(hist_r, hist_g, hist_b);
 				// console print
-				cout << post_data.giveMeJson() << endl;
+				//cout << post_data.giveMeJson() << endl;
 				// output
-				output << post_data.giveMeJson() << endl;
+				if( do_output) output << post_data.giveMeJson() << endl;
 				// sending.... ? 
 		}
 
@@ -311,6 +124,8 @@ int main() {
 
 
 	// sending test 
+
+	system("pause");
 
 	return 0;
 }

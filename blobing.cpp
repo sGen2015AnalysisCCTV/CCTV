@@ -33,8 +33,8 @@ CvBlobs getBlobs(Mat *frame, Mat* oframe)
     IplImage *lImg = cvCreateImage(cvSize(VIDEO_WIDTH, VIDEO_HEIGHT), IPL_DEPTH_LABEL, 1);
     
     // convert cv::Mat to cv::IplImage
-    temp= &IplImage(*frame);
-    otemp = &IplImage(*oframe);
+    temp= &IplImage(*frame); 
+    otemp = &IplImage(*oframe); 
     // Do Blobing  
     unsigned int r = cvLabel(temp, lImg, blobs);
     /*
@@ -44,12 +44,10 @@ CvBlobs getBlobs(Mat *frame, Mat* oframe)
                 
 
             });*/
-
-
-    cvFilterByArea(blobs, 5000, 100000);
-
+	 
+    cvFilterByArea(blobs, 5000, 100000); 
     
-    cvReleaseImage(&lImg);
+    cvReleaseImage(&lImg); 
     /*
     if(oframe != nullptr)
     {
@@ -76,6 +74,7 @@ void getBlobMat(Mat* frame, Mat*fore, CvBlobs blobs, vector<Mat>* images, int &h
                         dst, 
                         Size(tblob->maxx - tblob->minx, tblob->maxy - tblob->miny));
                 (*images).push_back(dst);
+				dst.release();
                 if(tblob->area >= max)
                 {
                     max = tblob->area;
