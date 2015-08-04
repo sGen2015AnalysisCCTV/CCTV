@@ -1,7 +1,9 @@
 #include "blobing.hpp"
-void getFrameDominantColor(Mat *frame, CvBlob* tblob, int &hist_r, int &hist_g, int &hist_b)
+Scalar getFrameDominantColor(Mat *frame, CvBlob* tblob)
 {// function that returns dominant color in Blob Mat respectitively. 
 // frame variable should be NOT GRAYSCALE.        
+//
+        Scalar color;
         int lx = tblob->minx, ly = tblob->miny;
         int rx = tblob->maxx, ry = tblob->maxy;
         int tr = 0, tg = 0, tb = 0;
@@ -19,45 +21,29 @@ void getFrameDominantColor(Mat *frame, CvBlob* tblob, int &hist_r, int &hist_g, 
         }
         if(pCount == 0) return;
         r /= pCount; g /= pCount; b /= pCount;
-		hist_r = r; hist_g = g; hist_b = b;
+        color.val[0] = b; color.val[1] = g; color.val[2] = r;
+        return color;
         
 }
 
-CvBlobs getBlobs(Mat *frame, Mat* oframe)
+CvBlobs getBlobs(Mat *frame)
 {// function that returns blob algorithm result with CvBlobs object.
     //frame     : the image that want to extract blobs
     //images    : the vector of image that store blob results.
     // !! frames should be gray scale image. if not, assertion will failed.
     CvBlobs blobs;
-    IplImage *temp, *otemp;
-    IplImage *lImg = cvCreateImage(cvSize(VIDEO_WIDTH, VIDEO_HEIGHT), IPL_DEPTH_LABEL, 1);
-    
+    IplImage *temp, *lImg = cvCreateImage(cvSize(VIDEO_WIDTH, VIDEO_HEIGHT), IPL_DEPTH_LABEL, 1);
+        
     // convert cv::Mat to cv::IplImage
     temp= &IplImage(*frame); 
-    otemp = &IplImage(*oframe); 
     // Do Blobing  
     unsigned int r = cvLabel(temp, lImg, blobs);
-    /*
-    for_each(blobs.begin(), blobs.end(),
-            [&](pair<CvLabel, CvBlob*> blob){
-                CvBlob* tblob = blob.second;
-                
-
-            });*/
-	 
     cvFilterByArea(blobs, 5000, 100000); 
-    
     cvReleaseImage(&lImg); 
-    /*
-    if(oframe != nullptr)
-    {
-        cvRenderBlobs(lImg, blobs, otemp, otemp, CV_BLOB_RENDER_BOUNDING_BOX); 
-    }
-    */
     return blobs;
 } 
 
-void getBlobMat(Mat* frame, Mat*fore, CvBlobs blobs, vector<Mat>* images, int &hist_r, int &hist_g, int &hist_b)
+void getBlobMat(Mat* frame, Mat*fore, CvBlobs blobs, vector<Mat>* images, Scalar &humanColor)
 {// function that returns specific Mat area of CvBlob object respectively with vector object
     // assert((*frame).channels() != 1 && "frame is not grayscale");
 
@@ -84,7 +70,7 @@ void getBlobMat(Mat* frame, Mat*fore, CvBlobs blobs, vector<Mat>* images, int &h
             });
 
     if(maxblob != NULL) 
-        getFrameDominantColor(frame, maxblob, hist_r, hist_g, hist_b);
+        humanColor = getFrameDominantColor(frame, maxblob);
 
 
 

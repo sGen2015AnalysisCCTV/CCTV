@@ -20,15 +20,14 @@ int main() {
 	bool					clicked;
 	char					waitKey_exit;
 	int						waitKey_delay;
-	char*					window_name_main; 
-	char*					video_name;
-	char*					output_name;
+	const char*					window_name_main; 
+	const char*					video_name;
+	const char*					output_name;
 	int						i, j; 
-	cv::Point				p_head;
-	cv::Point				p_left_hand;
-	cv::Point				p_right_hand;
-	cv::Point				p_center;
+        Human                                   humanCoord;
+        Scalar                                  humanColor;
 	int						hist_r, hist_g, hist_b;
+
 	BackgroundSubtractorMOG2        bg;
 	vector< vector<Point> >	contours; 
 	cv::Mat					contours_image;
@@ -41,7 +40,7 @@ int main() {
 	window_name_main = "asdf"; 
 	video_name = "temp.avi";
 	output_name = "data.txt"; 
-	cam.open("temp_origin.avi"); //cam.open( 1 );
+	cam.open(0); //cam.open( 1 );
 	cv::namedWindow( window_name_main );
 	writer = cv::VideoWriter(video_name, CV_FOURCC('M', 'J', 'P', 'G'),
 							15.0, Size(VIDEO_WIDTH, VIDEO_HEIGHT),
@@ -88,28 +87,28 @@ int main() {
 				drawContours(fore, contours, i, Scalar(255), CV_FILLED); 
 		}
 
-		// blobing
-		hist_r = hist_g = hist_b = 0; 
+		
+		memset(&humanColor.val, 0, sizeof(humanColor.val));
 
-        blobs = getBlobs(&fore, &frame);
-        getBlobMat(&frame,&fore, blobs, &blobs_image, hist_r, hist_g, hist_b);  
+        blobs = getBlobs(&fore);
+        getBlobMat(&frame,&fore, blobs, &blobs_image, humanColor);  
 
 		if (blobs_image.size() > 0) {
 			// skeleton
-			p_head = p_left_hand = p_right_hand = cv::Point(0, 0);
+			memset(&humanCoord, 0, sizeof(Human));
 
-			starSkeleton(blobs_image[0], blobs_image[0], p_head, p_left_hand, p_right_hand, p_center, 20);
-
+			starSkeleton(blobs_image[0], blobs_image[0], humanCoord, 20);
 			// show!
 			cv::imshow(window_name_main, blobs_image[0]);
 
 			// post data
 				// make data
-				post_data.push_head(p_head);
-				post_data.push_left_hand(p_left_hand);
-				post_data.push_right_hand(p_right_hand);
-				post_data.push_center(p_center);
-				post_data.push_hist(hist_r, hist_g, hist_b);
+				post_data.push_head(humanCoord.head);
+				post_data.push_left_hand(humanCoord.larm);
+				post_data.push_right_hand(humanCoord.rarm);
+				post_data.push_center(humanCoord.center);
+				post_data.push_hist(humanColor.val[2], humanColor.val[1], humanColor.val[0]);
+                                post_data.push_upperHand(isHarzardous(humanCoord));
 				// console print
 				//cout << post_data.giveMeJson() << endl;
 				// output

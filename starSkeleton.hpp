@@ -2,7 +2,17 @@
 
 using namespace std;
 using namespace cvb;
-
+typedef struct Human{
+    cv::Point head, larm, rarm, center;
+}Human;
+bool isHarzardous(Human& h)
+{
+    if(h.larm.y > h.head.y && h.rarm.y > h.head.y)
+    {
+        return true;
+    }
+    return false;
+}
 // print mat for debuging
 void printMat( cv::Mat &mat, const char *output_path ) {
 	ofstream output( output_path );
@@ -90,7 +100,7 @@ point_cnt : pointing count
 return : 1 - success
 0 - has occured unkown error (but never give an info about what error occured)
 */
-int starSkeleton(cv::Mat &input_mat, cv::Mat &output_mat, cv::Point &head, cv::Point &left, cv::Point &right, cv::Point &center, unsigned int huristic_distance = 20) {
+int starSkeleton(cv::Mat &input_mat, cv::Mat &output_mat, Human &human, unsigned int huristic_distance = 20) {
 
 	cv::Mat origin, graph, skel;
 	cv::Point point_center;
@@ -338,11 +348,15 @@ I_FOUND_FIRST_CONTOUR:
 	cv::circle( skel, vector_derivative_point[head_idx], circle_size, color_head, circle_thickness);
 	cv::circle( skel, vector_derivative_point[left_hand_idx], circle_size, color_left_hand, circle_thickness);
 	cv::circle( skel, vector_derivative_point[right_hand_idx], circle_size, color_right_hand, circle_thickness);
-
-	head = vector_derivative_point[head_idx];
-	left = vector_derivative_point[left_hand_idx];
-	right = vector_derivative_point[right_hand_idx];
-	center = point_center;
+        
+        putText(skel, "Center", point_center, 2, 1.2, color_center);
+        putText(skel, "Head", vector_derivative_point[head_idx], 2, 1.2, color_head);
+        putText(skel, "larm", vector_derivative_point[left_hand_idx],2, 1.2, color_left_hand);
+        putText(skel, "rarm", vector_derivative_point[right_hand_idx], 2,1.2, color_right_hand);
+        human.center = point_center;
+        human.head = vector_derivative_point[head_idx];
+        human.larm = vector_derivative_point[left_hand_idx];
+        human.rarm = vector_derivative_point[right_hand_idx];
 
 	// draw all point
 	if (false) {

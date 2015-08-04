@@ -45,7 +45,7 @@ public:
 	std::string p_right_hand;
 	std::string p_center;
 	std::string hist;
-
+        std::string upperHand;
 	void push_head(cv::Point p) {
 		p_head.clear();
 		p_head += std::to_string(p.x);
@@ -78,13 +78,19 @@ public:
 		hist += ",";
 		hist += to_string(b);
 	};
+        void push_upperHand(bool isHarzardous)
+        {
+                upperHand.clear();
+                upperHand += to_string(isHarzardous);
+        }
 	std::string giveMeJson() {
 		std::string rtn;
 		rtn += "{\"head\":[" + p_head + "],";
 		rtn += "\"left\":[" + p_left_hand + "],";
 		rtn += "\"right\":[" + p_right_hand + "],";
 		rtn += "\"center\":[" + p_center + "],";
-		rtn += "\"hist\":[" + hist + "]";
+		rtn += "\"hist\":[" + hist + "],";
+                rtn += "\"upperHand\":[" + upperHand + "]";
 		rtn += "}";
 		return rtn;
 	};
