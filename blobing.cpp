@@ -19,7 +19,7 @@ Scalar getFrameDominantColor(Mat *frame, CvBlob* tblob)
                 r += tr; g += tg; b += tb;
             }
         }
-        if(pCount == 0) return;
+        if(pCount == 0) return cv::Scalar(0);
         r /= pCount; g /= pCount; b /= pCount;
         color.val[0] = b; color.val[1] = g; color.val[2] = r;
         return color;

@@ -218,7 +218,7 @@ I_FOUND_FIRST_CONTOUR:
 					}
 					vector_graph_distance.push_back( getDistanceTwoPoint( point_center, point_search_contour ) );
 					vector_graph_point.push_back( point_search_contour );
-					if (vector_graph_distance.size() < 10000)
+					if (vector_graph_distance.size() > 10000)
 						return 0;
 					break;
 				}
@@ -345,14 +345,14 @@ I_FOUND_FIRST_CONTOUR:
 	cv::circle( skel, vector_derivative_point[left_hand_idx], circle_size, color_left_hand, circle_thickness);
 	cv::circle( skel, vector_derivative_point[right_hand_idx], circle_size, color_right_hand, circle_thickness);
         
-        putText(skel, "Center", point_center, 2, 1.2, color_center);
-        putText(skel, "Head", vector_derivative_point[head_idx], 2, 1.2, color_head);
-        putText(skel, "larm", vector_derivative_point[left_hand_idx],2, 1.2, color_left_hand);
-        putText(skel, "rarm", vector_derivative_point[right_hand_idx], 2,1.2, color_right_hand);
-        human.center = point_center;
-        human.head = vector_derivative_point[head_idx];
-        human.larm = vector_derivative_point[left_hand_idx];
-        human.rarm = vector_derivative_point[right_hand_idx];
+    putText(skel, "Center", point_center, 2, 1.2, color_center);
+    putText(skel, "Head", vector_derivative_point[head_idx], 2, 1.2, color_head);
+    putText(skel, "larm", vector_derivative_point[left_hand_idx],2, 1.2, color_left_hand);
+    putText(skel, "rarm", vector_derivative_point[right_hand_idx], 2,1.2, color_right_hand);
+    human.center = point_center;
+    human.head = vector_derivative_point[head_idx];
+    human.larm = vector_derivative_point[left_hand_idx];
+    human.rarm = vector_derivative_point[right_hand_idx];
 
 	// draw all point
 	if (false) {

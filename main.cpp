@@ -49,7 +49,7 @@ int main() {
 	if( do_output ) output.open(output_name, 'w');
 	
 	// manual start 
-    while( false ) {
+    while( true ) {
         cam >> frame;
         if( waitKey( waitKey_delay ) == 32 ) 
             break;
@@ -75,8 +75,8 @@ int main() {
         dilate(fore, fore, Mat());
 
 		// filling
-        contours_image = fore.clone();
-
+		cout << "filling start" << endl;
+        contours_image = fore.clone(); 
 		findContours(contours_image, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE); 
 		for (int i = 0; i < contours.size(); i++)
 		{  
@@ -89,6 +89,7 @@ int main() {
 			else 
 				drawContours(fore, contours, i, Scalar(255), CV_FILLED); 
 		}
+		cout << "filling success" << endl;
 EXIT_FILLING:
 		
 		memset(&humanColor.val, 0, sizeof(humanColor.val));
@@ -98,8 +99,8 @@ EXIT_FILLING:
         getBlobMat(&frame,&fore, blobs, &blobs_image, humanColor);  
 
 		if (blobs_image.size() > 0) {
+			cout << "blob found" << endl;
 			// skeleton
-		
 			if (starSkeleton(blobs_image[0], blobs_image[0], humanCoord, 20)) {
 				// show!
 				cv::imshow(window_name_main, blobs_image[0]);
@@ -113,7 +114,7 @@ EXIT_FILLING:
 				post_data.push_hist(humanColor.val[2], humanColor.val[1], humanColor.val[0]);
 				post_data.push_upperHand(isHarzardous(humanCoord));
 				// console print
-				//cout << post_data.giveMeJson() << endl;
+				cout << post_data.giveMeJson() << endl;
 				// output
 				if (do_output) output << post_data.giveMeJson() << endl;
 				// sending.... ? 
