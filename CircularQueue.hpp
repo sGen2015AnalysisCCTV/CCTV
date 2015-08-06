@@ -1,4 +1,5 @@
 #pragma once
+#include "main.hpp"
 #include <queue>
 #include <mutex>
 #include <condition_variable>
@@ -10,8 +11,9 @@ class CircularQueue
         std::queue<T> q;
         mutable std::mutex m;
         std::condition_variable c;
+		unsigned int max_size;
     public:
-        CircularQueue(void): q(), m(), c()
+		CircularQueue(unsigned int max_size) : q(), m(), c(), max_size(max_size)
         {
 
         }
@@ -26,11 +28,14 @@ class CircularQueue
             std::lock_guard<std::mutex> lock(m);
             //unlock method is automatically excuted when destructor called
             
+			if (q.size() > max_size)
+				q.pop();
+
             q.push(t);
             c.notify_one();
         }
 
-        void dequeue(void)
+        T dequeue(void)
         {
             std::unique_lock<std::mutex> lock(m);
             //unique lock doesn't try lock when mutex is already locked.
