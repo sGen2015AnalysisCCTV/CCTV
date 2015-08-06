@@ -19,7 +19,8 @@
 #include <string>
 #include <list> 
 #include <time.h>
-#include <thread>
+#include <thread> 
+#include "CircularQueue.hpp"
 
 #define VIDEO_WIDTH 640
 #define VIDEO_HEIGHT 480
@@ -45,7 +46,8 @@ public:
 	std::string p_right_hand;
 	std::string p_center;
 	std::string hist;
-        std::string upperHand;
+    std::string upperHand;
+
 	void push_head(cv::Point p) {
 		p_head.clear();
 		p_head += std::to_string(p.x);
@@ -89,8 +91,8 @@ public:
 		rtn += "\"left\":[" + p_left_hand + "],";
 		rtn += "\"right\":[" + p_right_hand + "],";
 		rtn += "\"center\":[" + p_center + "],";
-		rtn += "\"hist\":[" + hist + "],";
-                rtn += "\"upperHand\":[" + upperHand + "]";
+		rtn += "\"hist\":[" + hist + "]";
+		//rtn += "\"upperHand\":[" + upperHand + "]";
 		rtn += "}";
 		return rtn;
 	};
