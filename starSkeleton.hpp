@@ -218,15 +218,11 @@ I_FOUND_FIRST_CONTOUR:
 					}
 					vector_graph_distance.push_back( getDistanceTwoPoint( point_center, point_search_contour ) );
 					vector_graph_point.push_back( point_search_contour );
+					if (vector_graph_distance.size() < 10000)
+						return 0;
 					break;
 				}
-			}
-			// can't find contour
-			// increase search_dist
-			if( i==8 )		
-				search_dist++;
-			else
-				search_dist = 1;
+			} 
 		} while ( point_search_contour!=point_first );  
 	}
 

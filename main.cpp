@@ -24,8 +24,8 @@ int main() {
 	const char*					video_name;
 	const char*					output_name;
 	int						i, j; 
-        Human                                   humanCoord;
-        Scalar                                  humanColor;
+    Human                                   humanCoord;
+    Scalar                                  humanColor;
 	int						hist_r, hist_g, hist_b;
 
 	BackgroundSubtractorMOG2        bg;
@@ -40,7 +40,7 @@ int main() {
 	window_name_main = "asdf"; 
 	video_name = "temp.avi";
 	output_name = "data.txt"; 
-	cam.open(0); //cam.open( 1 );
+	cam.open(0); 
 	cv::namedWindow( window_name_main );
 	writer = cv::VideoWriter(video_name, CV_FOURCC('M', 'J', 'P', 'G'),
 							15.0, Size(VIDEO_WIDTH, VIDEO_HEIGHT),
@@ -76,54 +76,55 @@ int main() {
 
 		// filling
         contours_image = fore.clone();
+
 		findContours(contours_image, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE); 
 		for (int i = 0; i < contours.size(); i++)
 		{  
-			if (contours[i].size() > 5000) break; // breaking memory exception
+			for (int j = 0; j < contours[i].size(); j++)
+				if (contours[i][j].x < 0 || contours[i][j].y < 0)
+					goto EXIT_FILLING;
 			double area0 = contourArea(contours[i]); 
 			if (area0 < 2500) 
 				drawContours(fore, contours, i, Scalar(0), CV_FILLED); 
 			else 
 				drawContours(fore, contours, i, Scalar(255), CV_FILLED); 
 		}
-
+EXIT_FILLING:
 		
 		memset(&humanColor.val, 0, sizeof(humanColor.val));
+		memset(&humanCoord, 0, sizeof(Human));
 
         blobs = getBlobs(&fore);
         getBlobMat(&frame,&fore, blobs, &blobs_image, humanColor);  
 
 		if (blobs_image.size() > 0) {
 			// skeleton
-			memset(&humanCoord, 0, sizeof(Human));
+		
+			if (starSkeleton(blobs_image[0], blobs_image[0], humanCoord, 20)) {
+				// show!
+				cv::imshow(window_name_main, blobs_image[0]);
 
-			starSkeleton(blobs_image[0], blobs_image[0], humanCoord, 20);
-			// show!
-			cv::imshow(window_name_main, blobs_image[0]);
-
-			// post data
-				// make data
+				// post data
+					// make data
 				post_data.push_head(humanCoord.head);
 				post_data.push_left_hand(humanCoord.larm);
 				post_data.push_right_hand(humanCoord.rarm);
 				post_data.push_center(humanCoord.center);
 				post_data.push_hist(humanColor.val[2], humanColor.val[1], humanColor.val[0]);
-                                post_data.push_upperHand(isHarzardous(humanCoord));
+				post_data.push_upperHand(isHarzardous(humanCoord));
 				// console print
 				//cout << post_data.giveMeJson() << endl;
 				// output
-				if( do_output) output << post_data.giveMeJson() << endl;
+				if (do_output) output << post_data.giveMeJson() << endl;
 				// sending.... ? 
+			}
 		}
 
         if (cv::waitKey(waitKey_delay) == waitKey_exit ) {
                 break; 
         } 
     } 
-
-
-	// sending test 
-
+	 
 	system("pause");
 
 	return 0;
