@@ -11,19 +11,11 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 	return size * nmemb;
 }
 
-char* getNow() {
-	time_t t = time(0);
-	tm t2 = *localtime(&t);
-	char now[80];
-	strftime(now, sizeof(now), "%Y %m %d %r", &t2);
-	return now;
-}
-
 // send caution data formed json
 string sendToServerCaution(const char* json)
 {
 	// check it's called
-	cout << "send caution : " << json << endl;
+	//cout << "send caution : " << json << endl;
 
 	CURL *curl;
 	CURLcode res;
@@ -70,7 +62,7 @@ string sendToServerVideo(const char* video_path)
 {
 	CURL *curl;
 	CURLcode res;
-
+	
 	struct curl_httppost *formpost = NULL;
 	struct curl_httppost *lastptr = NULL;
 	struct curl_slist *headerlist = NULL; 
@@ -83,11 +75,6 @@ string sendToServerVideo(const char* video_path)
 		&lastptr,
 		CURLFORM_COPYNAME, "userId",
 		CURLFORM_COPYCONTENTS, "1",
-		CURLFORM_END);  
-	curl_formadd(&formpost,
-		&lastptr,
-		CURLFORM_COPYNAME, "videoDate",
-		CURLFORM_COPYCONTENTS, getNow(),
 		CURLFORM_END); 
 	curl_formadd(&formpost,
 		&lastptr,
