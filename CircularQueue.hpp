@@ -30,7 +30,7 @@ class CircularQueue
             
 			if (q.size() > max_size)
 				q.pop();
-
+			
             q.push(t);
             c.notify_one();
         }
