@@ -6,6 +6,7 @@
 #include "ShapeDiscriptor.hpp" 
 #include "WebSocket.hpp"
 #include "main.hpp"
+#include <Windows.h>
 #include "subtraction.hpp"
 
 using namespace std;
@@ -39,7 +40,6 @@ int main() {
 	int						mode;
 	Human                                   humanCoord;
 	Scalar                                  humanColor;
-	int						hist_r, hist_g, hist_b;
 	CircularQueue<cv::Mat>	video_queue(100);
 	deque<postClass>		post_data_deque;
 	string					post_json;
@@ -141,10 +141,10 @@ MAIN:
 	// send thread create 
 	thread sendToServerCaution_thread([&]() {
 		string rtn;
-		while (mode >= 3) {
+		while (mode >= 3 && !isDanger) {
 			if (!isUploading && is_send_data) {
 				rtn = sendToServerCaution(post_json.c_str());
-				if (rtn[0] == '1')
+				if (rtn[0] == '1' && !isUploading)
 					isDanger = true;
 				if (mode == 3)
 					cout << "return : " << rtn << endl;
@@ -164,7 +164,7 @@ MAIN:
 				system(ffmpeg_convert_to_webm.c_str());
 				rtn = sendToServerVideo(video_webm_name);
 				if (rtn[0] == '1') {
-					waitKey(10000); isUploading = isDanger = false;
+					Sleep(10000); isUploading = isDanger = false;
 				}
 			}
 		}
@@ -193,7 +193,51 @@ MAIN:
 		}
 
 		// background-remove
-		bg.operator()(frame_alba, fore, 0);
+		cv::Mat				contours_image;
+		bg.operator()(frame_alba, fore, -1);
+		
+		cv::threshold(fore, fore, 250, 255, 0);
+		//for (int i = 0; i < 4; i++) erode(fore, fore, Mat());
+		for (int i = 0; i < 7; i++) dilate(fore, fore, Mat());
+		imshow("bgsub", fore);
+		// filling
+		contours_image = fore.clone();
+		findContours(contours_image, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+
+		for (int i = 0; i < contours.size(); i++)
+		{
+			for (int j = 0; j < contours[i].size(); j++)
+				if (contours[i][j].x < 0 || contours[i][j].y < 0)
+					goto EXITS;
+			double area0 = contourArea(contours[i]);
+			if (area0 < 20000)
+				drawContours(fore, contours, i, Scalar(0), CV_FILLED);
+			else
+			{
+				drawContours(fore, contours, i, Scalar(255), CV_FILLED);
+
+			}
+		}
+		if (contours.size() < 100000 && contours.size() > 4)
+		{
+			vector<vector<Point> > hull(contours.size());
+			for (int i = 0; i < 10; i++) dilate(fore, fore, Mat());
+			for (int i = 0; i < contours.size(); i++)
+			{
+				for (int j = 0; j < contours[i].size(); j++)
+					if (contours[i][j].x < 0 || contours[i][j].y < 0)
+						goto EXITS;
+				//if (contours[i].size() > 5000) break;
+
+				approxPolyDP(Mat(contours[i]), hull[i], 10, true);
+				drawContours(fore, hull, i, Scalar(255, 0, 255), CV_FILLED);
+			}
+		}
+		for (int i = 0; i < 4; i++) erode(fore, fore, Mat());
+		imshow("fore", fore);
+	EXITS:
+		//subtraction(bg, bg2, frame_alba, fore, thresh);
+		/*bg.operator()(frame_alba, fore, 0);
 		cv::threshold(fore, fore, 250, 255, 0);
 		erode(fore, fore, Mat());
 		dilate(fore, fore, Mat());
@@ -215,7 +259,7 @@ MAIN:
 				drawContours(fore, contours, i, Scalar(255), CV_FILLED);
 		}
 	EXIT_FILLING:
-
+	*/
 		memset(&humanColor.val, 0, sizeof(humanColor.val));
 		memset(&humanCoord, 0, sizeof(Human));
 
